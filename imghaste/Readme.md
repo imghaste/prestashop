@@ -1,0 +1,1 @@
+# imghaste.com Image Optimization Service 
