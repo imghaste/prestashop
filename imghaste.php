@@ -1,232 +1,222 @@
 <?php
 /**
-* 2007-2020 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2020 PrestaShop SA
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
+ * 2007-2020 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2020 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PrestaShop SA
+ */
 
 if (!defined('_PS_VERSION_')) {
-    exit;
+	exit;
 }
 
 class Imghaste extends Module
 {
-    protected $config_form = false;
+	protected $config_form = false;
 
-    public function __construct()
-    {
-        $this->name = 'imghaste';
-        $this->tab = 'mobile';
-        $this->version = '1.0.0';
-        $this->author = 'imghaste ';
-        $this->need_instance = 0;
+	public function __construct()
+	{
+		$this->name = 'imghaste';
+		$this->tab = 'mobile';
+		$this->version = '1.0.1';
+		$this->author = 'imghaste';
+		$this->need_instance = 0;
 
-        /**
-         * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
-         */
-        $this->bootstrap = true;
+		/**
+		 * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
+		 */
+		$this->bootstrap = true;
 
-        parent::__construct();
+		parent::__construct();
 
-        $this->displayName = $this->l('imghaste.com Image Optimization Service ');
-        $this->description = $this->l('Image Optimization Service
+		$this->displayName = $this->l('imghaste.com Image Optimization Service ');
+		$this->description = $this->l('Image Optimization Service
 The first White Label solution for your website
 with NO URL REWRITE');
 
-        $this->confirmUninstall = $this->l('Are you sure?');
+		$this->confirmUninstall = $this->l('Are you sure?');
 
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-    }
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+	}
 
-    /**
-     * Don't forget to create update methods if needed:
-     * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
-     */
-    public function install()
-    {            
-        Configuration::updateValue('IMGHASTE_FILENAME', 'image_service');
-        Configuration::updateValue('IMGHASTE_DOMAIN', 'example.com');
+	/**
+	 * Don't forget to create update methods if needed:
+	 * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
+	 */
+	public function install()
+	{
+		Configuration::updateValue('IMGHASTE_FILENAME', 'image-service.ih.js');
+		Configuration::updateValue('IMGHASTE_DOMAIN', 'example.com');
 
-        return parent::install() &&
-            $this->registerHook('header') &&
-            $this->registerHook('backOfficeHeader');
-    }
+		return parent::install() &&
+			$this->registerHook('header') &&
+			$this->registerHook('backOfficeHeader');
+	}
 
-    public function uninstall()
-    {
-        Configuration::deleteByName('IMGHASTE_FILENAME');
-        Configuration::deleteByName('IMGHASTE_DOMAIN');
+	public function uninstall()
+	{
+		Configuration::deleteByName('IMGHASTE_FILENAME');
+		Configuration::deleteByName('IMGHASTE_DOMAIN');
 
-        return parent::uninstall();
-    }
+		return parent::uninstall();
+	}
 
-    /**
-     * Load the configuration form
-     */
-    public function getContent()
-    {
-        /**
-         * If values have been submitted in the form, process.
-         */
-        if (((bool)Tools::isSubmit('submitImghasteModule')) == true) {
-            $this->postProcess();
-        }
+	/**
+	 * Load the configuration form
+	 */
+	public function getContent()
+	{
+		/**
+		 * If values have been submitted in the form, process.
+		 */
+		if (((bool)Tools::isSubmit('submitImghasteModule')) == true) {
+			$this->postProcess();
+		}
 
-        $this->context->smarty->assign('module_dir', $this->_path);
+		$this->context->smarty->assign('module_dir', $this->_path);
 
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+		$output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
 
-        return $output.$this->renderForm();
-    }
+		return $output.$this->renderForm();
+	}
 
-    /**
-     * Create the form that will be displayed in the configuration of your module.
-     */
-    protected function renderForm()
-    {
-        $helper = new HelperForm();
+	/**
+	 * Create the form that will be displayed in the configuration of your module.
+	 */
+	protected function renderForm()
+	{
+		$helper = new HelperForm();
 
-        $helper->show_toolbar = false;
-        $helper->table = $this->table;
-        $helper->module = $this;
-        $helper->default_form_language = $this->context->language->id;
-        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
+		$helper->show_toolbar = false;
+		$helper->table = $this->table;
+		$helper->module = $this;
+		$helper->default_form_language = $this->context->language->id;
+		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
 
-        $helper->identifier = $this->identifier;
-        $helper->submit_action = 'submitImghasteModule';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
-            .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
+		$helper->identifier = $this->identifier;
+		$helper->submit_action = 'submitImghasteModule';
+		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
+			.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+		$helper->token = Tools::getAdminTokenLite('AdminModules');
 
-        $helper->tpl_vars = array(
-            'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id,
-        );
+		$helper->tpl_vars = [
+			'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
+			'languages' => $this->context->controller->getLanguages(),
+			'id_language' => $this->context->language->id,
+		];
 
-        return $helper->generateForm(array($this->getConfigForm()));
-    }
+		return $helper->generateForm(array($this->getConfigForm()));
+	}
 
-    /**
-     * Create the structure of your form.
-     */
-    protected function getConfigForm()
-    {
-        return array(
-            'form' => array(
-                'legend' => array(
-                'title' => $this->l('Settings'),
-                'icon' => 'icon-cogs',
-                ),
-                'input' => array(                    
-                    array(
-                        'type' => 'text',
-                        'name' => 'IMGHASTE_FILENAME',
-                        'label' => $this->l('Filename'),
-                    ),
-                    array(
-                        'type' => 'text',
-                        'name' => 'IMGHASTE_DOMAIN',
-                        'label' => $this->l('Domain'),
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Generate'),
-                ),
-            ),
-        );
-    }
+	/**
+	 * Create the structure of your form.
+	 */
+	protected function getConfigForm()
+	{
+		return [
+			'form' => [
+				'legend' => [
+					'title' => $this->l('Settings'),
+					'icon' => 'icon-cogs',
+				],
+				'input' => [
+					[
+						'type' => 'text',
+						'name' => 'IMGHASTE_DOMAIN',
+						'label' => $this->l('Domain'),
+					],
+				],
+				'submit' => [
+					'title' => $this->l('Generate'),
+				],
+			],
+		];
+	}
 
-    /**
-     * Set values for the inputs.
-     */
-    protected function getConfigFormValues()
-    {
-        return array(            
-            'IMGHASTE_FILENAME' => Configuration::get('IMGHASTE_FILENAME', 'image_service_example'),
-            'IMGHASTE_DOMAIN' => Configuration::get('IMGHASTE_DOMAIN', 'example.com'),
-        );
-    }
+	/**
+	 * Set values for the inputs.
+	 */
+	protected function getConfigFormValues()
+	{
+		return array(
+			'IMGHASTE_DOMAIN' => Configuration::get('IMGHASTE_DOMAIN', 'example.com'),
+		);
+	}
 
-    /**
-     * Save form data.
-     */
-    protected function postProcess()
-    {
-        $form_values = $this->getConfigFormValues();
+	/**
+	 * Save form data.
+	 */
+	protected function postProcess()
+	{
+		$form_values = $this->getConfigFormValues();
 
-        foreach (array_keys($form_values) as $key) {
-            Configuration::updateValue($key, Tools::getValue($key));
-        }
-        $config_domain = Configuration::get('IMGHASTE_DOMAIN');
-        $config_file = Configuration::get('IMGHASTE_FILENAME');
-        $data = 'self.importScripts(\'https://cdn.imghaste.com/v1/' . $config_domain . '/service-worker.js\');';
-        $filename = $this->normalizeDirectory(_PS_ROOT_DIR_) . $config_file;
-        file_put_contents($filename, $data);
-    }
+		foreach (array_keys($form_values) as $key) {
+			Configuration::updateValue($key, Tools::getValue($key));
+		}
+		$config_domain = Configuration::get('IMGHASTE_DOMAIN');
+		$config_file = 'image-service.ih.js';
+		$data = "self.importScripts('https://{$config_domain}/service-worker.js');";
+		$filename = $this->normalizeDirectory(_PS_ROOT_DIR_) . $config_file;
+		file_put_contents($filename, $data);
+	}
 
-    /**
-    * Add the CSS & JavaScript files you want to be loaded in the BO.
-    */
-    public function hookBackOfficeHeader()
-    {
-        if (Tools::getValue('module_name') == $this->name) {
-            $this->context->controller->addJS($this->_path.'views/js/back.js');
-            $this->context->controller->addCSS($this->_path.'views/css/back.css');
-        }
-    }
+	/**
+	 * Add the CSS & JavaScript files you want to be loaded in the BO.
+	 */
+	public function hookBackOfficeHeader()
+	{
+		if (Tools::getValue('module_name') == $this->name) {
+			$this->context->controller->addJS($this->_path.'views/js/back.js');
+			$this->context->controller->addCSS($this->_path.'views/css/back.css');
+		}
+	}
 
-    /**
-     * Add the CSS & JavaScript files you want to be added on the FO.
-     */
-    public function hookHeader()
-    {
-        //$this->context->controller->addJS($this->_path.'/views/js/front.js');
-        //$this->context->controller->addCSS($this->_path.'/views/css/front.css');
-		$imghaste_filename = Configuration::get('IMGHASTE_FILENAME');
-		
+	/**
+	 * Add the CSS & JavaScript files you want to be added on the FO.
+	 */
+	public function hookHeader()
+	{
+		//$this->context->controller->addJS($this->_path.'/views/js/front.js');
+		//$this->context->controller->addCSS($this->_path.'/views/css/front.css');
+		$cname = Configuration::get('IMGHASTE_DOMAIN');
+
 		$this->context->smarty->assign(array(
-			'imghaste_filename' => $imghaste_filename,
+			'ih_cname' => $cname,
 		));
 
-		
-        return $this->display(__FILE__, 'header.tpl');
-    }    
 
-    protected function normalizeDirectory($directory)
-    {
-        $last = $directory[Tools::strlen($directory) - 1];
+		return $this->display(__FILE__, 'header.tpl');
+	}
 
-        if (in_array($last, array(
-            '/',
-            '\\',
-        ))) {
-            $directory[Tools::strlen($directory) - 1] = DIRECTORY_SEPARATOR;
+	protected function normalizeDirectory($directory)
+	{
+		$last = $directory[Tools::strlen($directory) - 1];
 
-            return $directory;
-        }
+		if (in_array($last, ['/','\\',])) {
+			$directory[Tools::strlen($directory) - 1] = DIRECTORY_SEPARATOR;
+			return $directory;
+		}
 
-        $directory .= DIRECTORY_SEPARATOR;
+		$directory .= DIRECTORY_SEPARATOR;
 
-        return $directory;
-    }
+		return $directory;
+	}
 }
