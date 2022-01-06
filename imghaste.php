@@ -47,10 +47,8 @@ class Imghaste extends Module
 
 		parent::__construct();
 
-		$this->displayName = $this->l('imghaste.com Image Optimization Service ');
-		$this->description = $this->l('Image Optimization Service
-The first White Label solution for your website
-with NO URL REWRITE');
+		$this->displayName = $this->l('CDN 2.0 - Image Optimizer - PWA');
+		$this->description = $this->l('PWA, AVIF, WebP, CDN, All Included');
 
 		$this->confirmUninstall = $this->l('Are you sure?');
 

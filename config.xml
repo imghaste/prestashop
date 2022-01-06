@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
 	<name>imghaste</name>
-	<displayName><![CDATA[imghaste.com Image Optimization Service ]]></displayName>
-	<version><![CDATA[1.0.0]]></version>
-	<description><![CDATA[Image Optimization Service
-The first White Label solution for your website
-with NO URL REWRITE]]></description>
-	<author><![CDATA[imghaste ]]></author>
+	<displayName><![CDATA[Image Optimization Service]]></displayName>
+	<version><![CDATA[1.0.1]]></version>
+	<description><![CDATA[Image Optimization Service]]></description>
+	<author><![CDATA[imghaste]]></author>
 	<tab><![CDATA[mobile]]></tab>
 	<is_configurable>1</is_configurable>
 	<need_instance>1</need_instance>
